@@ -8,11 +8,10 @@ headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit
 
 def main():
     final_data = add_time()
-    #print(final_data)
     sorted = pd.Series(final_data).sort_values(ascending=False)
     final_data = sorted.apply(convert_to_hours)
 
-    final_data.to_csv('speedrunners.csv')
+    final_data.to_csv('output.csv')
 
 
 def make_list():
@@ -70,7 +69,7 @@ def add_time():
     for id in id_names.keys() & player_times.keys():
         final[id_names[id]] = player_times[id]
 
-    print('All done! Check speedrunners.csv')
+    print('All done! Check output.csv')
     return final
 
 def convert_to_hours(seconds):
