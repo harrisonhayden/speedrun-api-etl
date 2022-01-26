@@ -16,7 +16,7 @@ def main():
     df['Total Time'] = df['Total Time'].apply(convert_to_hours)
     df.reset_index(drop=True, inplace=True)
 
-    df.to_csv('output.csv')
+    df.to_csv('output.csv', index=False)
 
     print('Execution time: ' + str(datetime.now() - startTime))
 
