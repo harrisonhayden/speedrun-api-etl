@@ -21,13 +21,13 @@ def main():
 def make_list():
     full_list = []
     offset = 0
-    runs = requests.get(HOST + 'runs?max=200&embed=players&game=' + GAME_ID, headers=headers).text
-    dict = json.loads(runs)
+    runs = requests.get(HOST + 'runs?max=200&embed=players&game=' + GAME_ID, headers=headers)
+    dict = runs.json()
 
     # loop through all pages (max 200 runs/page) and add to one big list
     while dict['pagination']['size'] == 200:
-        runs = requests.get(HOST + 'runs?max=200&embed=players&game=' + GAME_ID + '&offset=' + str(offset), headers=headers).text
-        dict = json.loads(runs)
+        runs = requests.get(HOST + 'runs?max=200&embed=players&game=' + GAME_ID + '&offset=' + str(offset), headers=headers)
+        dict = runs.json()
         ##new test code
         if not dict.get('data'):
             print ('number of runs processed: ' + str(len(full_list)))
