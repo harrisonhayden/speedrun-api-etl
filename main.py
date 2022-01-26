@@ -11,10 +11,12 @@ def main():
     startTime =  datetime.now()
 
     final_data = add_time()
-    sorted = pd.Series(final_data).sort_values(ascending=False)
-    final_data = sorted.apply(convert_to_hours)
+    df = pd.DataFrame.from_dict({'Username':final_data.keys(), 'Total Time':final_data.values()})
+    df.sort_values(by=['Total Time'], ascending=False, inplace=True)
+    df['Total Time'] = df['Total Time'].apply(convert_to_hours)
+    df.reset_index(drop=True, inplace=True)
 
-    final_data.to_csv('output.csv')
+    df.to_csv('output.csv')
 
     print('Execution time: ' + str(datetime.now() - startTime))
 
