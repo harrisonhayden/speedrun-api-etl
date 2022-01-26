@@ -15,12 +15,12 @@ id_to_game = json.load(open('id-game-map.json'))
 def main():
     startTime =  datetime.now()
 
-    #id_list = list(id_to_game.keys())
-    id_list = ['268zey6p', '4d709l17', 'j1l9qz1g']
+    id_list = list(id_to_game.keys())
     game_count = 1
 
     engine = sqlalchemy.create_engine(DATABASE_LOCATION)
-    conn = sqlite3.connect('player_times.sqlite')
+    connection = sqlite3.connect('player_times.sqlite')
+    cursor = connection.cursor()
     print('Opened database successfully')
 
     engine.execute('DROP TABLE IF EXISTS Speedruns')
@@ -38,32 +38,22 @@ def main():
         df.reset_index(drop=True, inplace=True)
         df['TotalTime'] = df['TotalTime'].apply(convert_to_hours)
 
+        sql_query = '''
+            CREATE TABLE IF NOT EXISTS Speedruns (
+            ID INTEGER PRIMARY KEY,
+            Username TEXT NOT NULL,
+            TotalTime TEXT NOT NULL,
+            Game TEXT NOT NULL
+        )
+        '''
 
-        # engine = sqlalchemy.create_engine(DATABASE_LOCATION)
-        # conn = sqlite3.connect('player_times.sqlite')
-        #cursor = conn.cursor()
-
-        #engine.execute('DROP TABLE IF EXISTS Speedruns')
-
-        # sql_query = '''
-        #     CREATE TABLE IF NOT EXISTS Speedruns (
-        #     ID INTEGER PRIMARY KEY,
-        #     Username TEXT NOT NULL,
-        #     TotalTime TEXT NOT NULL,
-        #     Game TEXT NOT NULL
-        # )
-        # '''
-
-        #cursor.execute(sql_query)
+        cursor.execute(sql_query)
 
         df.to_sql('Speedruns', engine, index=False, if_exists='append')
 
-
-
-
         game_count += 1
 
-    conn.close()
+    connection.close()
     print('Closed database successfully')
     print('Execution time: ' + str(datetime.now() - startTime))
 
@@ -89,20 +79,20 @@ def add_runs(game_id):
     usernames = []
     times = []
     games = []
-    run_count = 1
 
 
     for i in range(len(runs)):
-        print('Adding run data + (' + str(run_count) + '/' + str(len(runs)) + ')', end='\r')
-        if runs[i]['players']['data'][0].get('names'):
+        print('Adding run data (' + str(i + 1) + '/' + str(len(runs)) + ')', end='\r')
+
+        if runs[i]['players']['data'] == []:
+            usernames.append('(Obsolete)')
+        elif runs[i]['players']['data'][0].get('names'):
             usernames.append(runs[i]['players']['data'][0]['names']['international'])
         else:
             usernames.append(runs[i]['players']['data'][0]['name'])
 
         times.append(runs[i]['times']['primary_t'])
         games.append(id_to_game[game_id])
-
-        run_count += 1
 
     player_times = {
         'Username' : usernames,
